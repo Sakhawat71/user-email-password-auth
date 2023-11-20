@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import auth from "../../firebase/firebase.config";
+import { Link } from "react-router-dom";
 
 const SignIn = () => {
-    const [signUpError, setSignUpError] = useState('');
+    const [showError, setShowError] = useState('');
     const [success, setSuccess] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const emailRef = useRef(null);
+
+
 
     const handelSignIn = e => {
 
@@ -14,12 +18,9 @@ const SignIn = () => {
 
         const email = e.target.email.value;
         const password = e.target.password.value;
-        // console.log(email, password)
 
 
-
-
-        setSignUpError('');
+        setShowError('');
         setSuccess('');
 
         signInWithEmailAndPassword(auth, email, password)
@@ -32,10 +33,35 @@ const SignIn = () => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.log(errorCode, errorMessage)
-                setSignUpError(errorMessage)
+                setShowError(errorMessage)
             })
 
 
+    }
+
+    const handelResetPassword = () =>{
+        console.log('reset now',emailRef.current.value)
+        const email = emailRef.current.value;
+
+        if(!email){
+            setShowError('Please enter a valid email address.')
+            console.log('please! provide valid email')
+            return;
+        }
+
+        else if(!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email)){
+            setShowError("It should look like something@example.com")
+        }
+        sendPasswordResetEmail(auth,email)
+        .then(() =>{
+            alert('check your email')
+        })
+        .catch(error =>{
+            const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage)
+                setShowError(errorMessage)
+        })
     }
 
     return (
@@ -59,6 +85,7 @@ const SignIn = () => {
                                     placeholder="email"
                                     className="input input-bordered"
                                     name="email"
+                                    ref={emailRef}
                                     required />
                             </div>
                             {/* password */}
@@ -80,17 +107,22 @@ const SignIn = () => {
                                 </span>
 
                                 <label className="label">
-                                    <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
+                                    <Link 
+                                    onClick={handelResetPassword}
+                                    href="#" 
+                                    className="label-text-alt link link-hover"
+                                    >Forgot password?</Link>
                                 </label>
                             </div>
                             {/* button */}
                             <div className="form-control mt-6">
                                 <button className="btn btn-primary">Login</button>
                             </div>
-
+                            <p>Don`t have an account? <Link className="text-blue-600" to="/signup">SignUP</Link></p>
                         </form>
+                        
                         {
-                            signUpError && <p className="text-red-500">{signUpError}</p>
+                            showError && <p className="text-red-500">{showError}</p>
                         }
                         {
                             success && <p className="text-green-600">{success}</p>
