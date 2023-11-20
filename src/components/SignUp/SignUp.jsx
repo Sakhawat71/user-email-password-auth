@@ -8,11 +8,14 @@ const SignUp = () => {
     const [signUpError, setSignUpError] = useState('');
     const [success, setSuccess] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isChecked, setIsChecked] = useState(false);
 
     const handelOnSubmit = e => {
         e.preventDefault()
         const email = e.target.user_email.value;
         const password = e.target.user_password.value;
+        const termsAccept = e.target.terms.checked;
+        console.log(email,password,termsAccept)
 
         setSignUpError('');
         setSuccess('');
@@ -22,6 +25,11 @@ const SignUp = () => {
         }
         else if (!/[A-Z]/.test(password)) {
             setSignUpError("At least one uppercase letter is required")
+            return;
+        }
+        else if(!termsAccept){
+            setSignUpError("Please, Accept transaction condition");
+            return;
         }
 
         createUserWithEmailAndPassword(auth, email, password)
@@ -71,12 +79,27 @@ const SignUp = () => {
 
                 <br />
 
+                <div onClick={()=> setIsChecked(!isChecked)} className=" my-2 flex items-center ">
+                    <input
+                        type="checkbox"
+                        name="terms"
+                        id="terms"
+                        className="mr-2 cursor-pointer" />
+                    <label 
+                    htmlFor="terms"
+                    className="cursor-pointer">Accept our 
+                        <a className="text-blue-600 underline ml-1">terms and condition</a>
+                    </label>
+                </div>
+
                 <input
                     type="submit"
                     value="Submit"
                     className="btn text-white bg-sky-500 text-[16px]"
                 />
             </form>
+
+
             {
                 signUpError && <p className="text-red-500">{signUpError}</p>
             }
