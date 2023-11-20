@@ -70,7 +70,7 @@ const SignUp = () => {
                         className=" input input-bordered input-primary "
                         required
                     />
-                    <span onClick={() => setShowPassword(!showPassword)} className="text-center text-2xl absolute right-3 top-3">
+                    <span onClick={() => setShowPassword(!showPassword)} className="text-center text-xl absolute right-3 top-3">
                         {
                             showPassword ? <FaEyeSlash></FaEyeSlash> : <FaEye></FaEye>
                         }

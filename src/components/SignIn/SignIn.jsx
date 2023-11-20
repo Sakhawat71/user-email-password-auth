@@ -1,5 +1,43 @@
+import { useState } from "react";
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import auth from "../../firebase/firebase.config";
 
 const SignIn = () => {
+    const [signUpError, setSignUpError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handelSignIn = e => {
+
+        e.preventDefault();
+
+        const email = e.target.email.value;
+        const password = e.target.password.value;
+        // console.log(email, password)
+
+
+
+
+        setSignUpError('');
+        setSuccess('');
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then(result => {
+                const user = result.user;
+                console.log(user)
+                setSuccess('Login Successful ')
+            })
+            .catch(error => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage)
+                setSignUpError(errorMessage)
+            })
+
+
+    }
+
     return (
         <div>
             <div className="hero min-h-screen bg-base-200 mx-auto">
@@ -10,20 +48,37 @@ const SignIn = () => {
                     </div>
                     <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
 
-                        <form className="card-body">
+                        <form onSubmit={handelSignIn} className="card-body">
                             {/* email */}
                             <div className="form-control">
                                 <label className="label">
                                     <span className="label-text">Email</span>
                                 </label>
-                                <input type="email" placeholder="email" className="input input-bordered" required />
+                                <input
+                                    type="email"
+                                    placeholder="email"
+                                    className="input input-bordered"
+                                    name="email"
+                                    required />
                             </div>
                             {/* password */}
-                            <div className="form-control">
+                            <div className="form-control relative">
                                 <label className="label">
                                     <span className="label-text">Password</span>
                                 </label>
-                                <input type="password" placeholder="password" className="input input-bordered" required />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="password"
+                                    className="input input-bordered"
+                                    name="password"
+                                    required />
+
+                                <span onClick={() => setShowPassword(!showPassword)} className="text-center text-xl absolute right-3 top-12">
+                                    {
+                                        showPassword ? <FaEyeSlash></FaEyeSlash> : <FaEye></FaEye>
+                                    }
+                                </span>
+
                                 <label className="label">
                                     <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
                                 </label>
@@ -34,6 +89,13 @@ const SignIn = () => {
                             </div>
 
                         </form>
+                        {
+                            signUpError && <p className="text-red-500">{signUpError}</p>
+                        }
+                        {
+                            success && <p className="text-green-600">{success}</p>
+                        }
+
 
                     </div>
                 </div>
