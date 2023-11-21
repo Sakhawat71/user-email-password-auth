@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import auth from "../../firebase/firebase.config";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -13,10 +13,11 @@ const SignUp = () => {
 
     const handelOnSubmit = e => {
         e.preventDefault()
+        const name = e.target.user_name.value;
         const email = e.target.user_email.value;
         const password = e.target.user_password.value;
         const termsAccept = e.target.terms.checked;
-        console.log(email,password,termsAccept)
+        console.log(email, password, termsAccept)
 
         setSignUpError('');
         setSuccess('');
@@ -28,8 +29,12 @@ const SignUp = () => {
             setSignUpError("At least one uppercase letter is required")
             return;
         }
-        else if(!termsAccept){
+        else if (!termsAccept) {
             setSignUpError("Please, Accept transaction condition");
+            return;
+        }
+        else if (!/^[a-zA-Z-' ]{3,}$/.test(name)) {
+            setSignUpError("Name should be at least 3 characters.");
             return;
         }
 
@@ -37,6 +42,21 @@ const SignUp = () => {
             .then(result => {
                 console.log(result.user)
                 setSuccess('Successfully registered')
+
+
+                updateProfile(result.user, {
+                    displayName: name,
+                })
+                    .then()
+                    .catch()
+
+
+                sendEmailVerification(result.user)
+                    .then(() => {
+                        alert('Email verification sent!')
+                    })
+
+
             })
             .catch(error => {
                 const errorCode = error.code;
@@ -52,6 +72,15 @@ const SignUp = () => {
             <h2 className="text-3xl">Please SignUp</h2>
 
             <form onSubmit={handelOnSubmit} className=" py-5 my-2 flex flex-col justify-center items-center">
+                <input
+                    type="taxt"
+                    name="user_name"
+                    id=""
+                    placeholder="Your Name"
+                    className=" input input-bordered input-primary "
+                    required
+                />
+                <br />
                 <input
                     type="email"
                     name="user_email"
@@ -80,15 +109,15 @@ const SignUp = () => {
 
                 <br />
 
-                <div onClick={()=> setIsChecked(!isChecked)} className=" my-2 flex items-center ">
+                <div onClick={() => setIsChecked(!isChecked)} className=" my-2 flex items-center ">
                     <input
                         type="checkbox"
                         name="terms"
                         id="terms"
                         className="mr-2 cursor-pointer" />
-                    <label 
-                    htmlFor="terms"
-                    className="cursor-pointer">Accept our 
+                    <label
+                        htmlFor="terms"
+                        className="cursor-pointer">Accept our
                         <a className="text-blue-600 underline ml-1">terms and condition</a>
                     </label>
                 </div>

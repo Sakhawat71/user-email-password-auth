@@ -27,7 +27,12 @@ const SignIn = () => {
             .then(result => {
                 const user = result.user;
                 console.log(user)
-                setSuccess('Login Successful ')
+                if(result.user.emailVerified){
+                    setSuccess('Login Successful')
+                }
+                else{
+                    alert('Please verify your email')
+                }
             })
             .catch(error => {
                 const errorCode = error.code;
@@ -52,6 +57,8 @@ const SignIn = () => {
         else if(!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email)){
             setShowError("It should look like something@example.com")
         }
+
+
         sendPasswordResetEmail(auth,email)
         .then(() =>{
             alert('check your email')
