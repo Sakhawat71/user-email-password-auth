@@ -47,8 +47,15 @@ const SignUp = () => {
                 updateProfile(result.user, {
                     displayName: name,
                 })
-                    .then()
-                    .catch()
+                    .then(()=>{
+                        console.log('name update')
+                    })
+                    .catch(error => {
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+                        console.log(errorCode, errorMessage)
+                        setSignUpError(errorMessage)
+                    })
 
 
                 sendEmailVerification(result.user)
